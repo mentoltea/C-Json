@@ -1,0 +1,17 @@
+{
+	"name" : "table",
+	"id" : 1 ,
+	"child" : {
+		"c" : "c",
+		"d" : "ff"
+	},
+	"other" : [
+		{
+			"age" : 1.56
+		},
+		{
+			"name" : "name"
+		},
+		3
+	]
+}

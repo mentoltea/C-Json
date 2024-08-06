@@ -1,0 +1,18 @@
+{
+	"name" : "table",
+	"id" : 1,
+	"child" : {
+		"c" : "c",
+		"d" : "ff"
+	},
+	"other" : [
+		{
+			"age" : 1.560000
+		},
+		{
+			"name" : "name"
+		},
+		3
+	],
+	"KeYY" : "new data"
+}

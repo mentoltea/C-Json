@@ -51,12 +51,14 @@ typedef struct Token_struct Token;
 void init_json();
 
 json_child read_json(FILE* fd);
-int save_json(json_child* child, FILE* fd);
+void save_json(FILE* fd, json_child* child);
 
 json_pair parse_pair(Token*);
 json_object read_object(char*, size_t);
 json_object *read_array(char*, size_t);
 json_child read_child(char*, size_t);
 
+void fprintchild(FILE *fd, json_child *child, size_t tabs);
+void fprintarray(FILE *fd, json_object *array, size_t tabs);
 
 #endif

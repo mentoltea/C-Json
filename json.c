@@ -56,7 +56,11 @@ Token* split_into_pairs(char *str, size_t size, int array) {
     char *ptr, *start;
     char *end = str+size;
     char stopsymb = '}';
-    if (array) stopsymb = ']';
+    char symsymb = '{';
+    if (array) {
+        stopsymb = ']';
+        symsymb = '[';
+    }
     while (size!=0 && *end != stopsymb) {
         end--; size--;
     }
@@ -71,7 +75,7 @@ Token* split_into_pairs(char *str, size_t size, int array) {
         if (*ptr == ',') {
             ptr++;
         }
-        if (*ptr == '{' || *ptr == '}' || *ptr=='\n' || *ptr=='\t') {
+        if (*ptr == symsymb || *ptr == stopsymb || *ptr=='\n' || *ptr=='\t') {
             continue;
         }
         start = ptr;
@@ -91,7 +95,7 @@ Token* split_into_pairs(char *str, size_t size, int array) {
                 vec[i+1].start = temp.start;
                 continue;
             }
-            printf("Syntax error with \"");
+            printf("Syntax error with \"\n");
             printf("%s\n", string_from_ptrs(temp.start, temp.end));
             exit_on_error(1);
         }
@@ -100,7 +104,7 @@ Token* split_into_pairs(char *str, size_t size, int array) {
                 vec[i+1].start = temp.start;
                 continue;
             }
-            printf("Syntax error with []");
+            printf("Syntax error with []\n");
             printf("%s\n", string_from_ptrs(temp.start, temp.end));
             exit_on_error(1);
         } 
@@ -109,7 +113,7 @@ Token* split_into_pairs(char *str, size_t size, int array) {
                 vec[i+1].start = temp.start;
                 continue;
             }
-            printf("Syntax error with {}");
+            printf("Syntax error with {}\n");
             printf("%s\n", string_from_ptrs(temp.start, temp.end));
             exit_on_error(1);
         }
@@ -237,4 +241,126 @@ json_child read_json(FILE* fd) {
     fseek(fd, 0, SEEK_SET);
     char* str = read_from_file(fd, size);
     return read_child(str, size);
+}
+
+
+void fprintarray(FILE *fd, json_object *array, size_t tabs) {
+    size_t iter;
+
+    // iter = tabs;
+    // while (iter>0) {
+    //     printf("\t");
+    //     iter--;
+    // } 
+    fprintf(fd, "[\n");
+
+    // tabs++;
+    vector_metainfo meta = vec_meta(array);
+    // printf("size %d\n", meta.length);
+    json_object temp;
+    // for (int i=0; i<meta.length; i++) {
+    //     printf("%d ", array[i].type);
+    // }
+    for (int i=0; i<meta.length; i++) {
+        temp = array[i];
+        iter = tabs;
+        while (iter>0) {
+            fprintf(fd, "\t");
+            iter--;
+        } 
+        switch (temp.type) {
+            case STR:
+                fprintf(fd, "\"%s\"", temp.data.str);
+                break;
+            case INT:
+                fprintf(fd, "%d", temp.data.num);
+                break;
+            case FLOAT:
+                fprintf(fd, "%f", temp.data.dec);
+                break;
+            case CHILD:
+                fprintchild(fd, temp.data.child, tabs);
+                break;
+            case ARRAY:
+                fprintarray(fd, temp.data.array, tabs+1);
+                break;
+
+            default:
+                break;
+        }
+        if (i!=meta.length-1) {
+            fprintf(fd, ",");
+        }
+        //printf(" | %d", temp.type);
+        fprintf(fd, "\n");
+    }
+    tabs--;
+    iter = tabs;
+    while (iter>0) {
+        fprintf(fd, "\t");
+        iter--;
+    } fprintf(fd, "]");
+}
+
+void fprintchild(FILE *fd, json_child *child, size_t tabs) {
+    size_t iter;
+
+    // iter = tabs;
+    // while (iter>0) {
+    //     printf("\t");
+    //     iter--;
+    // }  
+    fprintf(fd, "{\n");
+
+    tabs++;
+    vector_metainfo meta = vec_meta(child->fields);
+    // printf("size %d\n", meta.length);
+    json_pair temp;
+    for (int i=0; i<meta.length; i++) {
+        temp = child->fields[i];
+        iter = tabs;
+        while (iter>0) {
+            fprintf(fd, "\t");
+            iter--;
+        } 
+        fprintf(fd, "\"%s\" : ", temp.key);
+        switch (temp.value.type) {
+            case STR:
+                fprintf(fd, "\"%s\"", temp.value.data.str);
+                break;
+            case INT:
+                fprintf(fd, "%d", temp.value.data.num);
+                break;
+            case FLOAT:
+                fprintf(fd, "%f", temp.value.data.dec);
+                break;
+            case CHILD:
+                fprintchild(fd, temp.value.data.child, tabs);
+                break;
+            case ARRAY:
+                fprintarray(fd, temp.value.data.array, tabs+1);
+                break;
+
+            default:
+                break;
+        }
+        if (i!=meta.length-1) {
+            fprintf(fd, ",");
+        }
+        //printf(" | %d", temp.value.type);
+        fprintf(fd, "\n");
+    }
+    tabs--;
+    iter = tabs;
+    while (iter>0) {
+        fprintf(fd, "\t");
+        iter--;
+    } fprintf(fd, "}");
+    if (tabs == 0) {
+        fprintf(fd, "\n");
+    }
+}
+
+void save_json(FILE* fd, json_child* child) {
+    fprintchild(fd, child, 0);
 }
