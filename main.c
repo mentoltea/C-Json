@@ -12,10 +12,13 @@ void printarray(json_object *array, size_t tabs) {
     // } 
     printf("[\n");
 
-    tabs++;
+    // tabs++;
     vector_metainfo meta = vec_meta(array);
     // printf("size %d\n", meta.length);
     json_object temp;
+    // for (int i=0; i<meta.length; i++) {
+    //     printf("%d ", array[i].type);
+    // }
     for (int i=0; i<meta.length; i++) {
         temp = array[i];
         iter = tabs;
@@ -111,6 +114,9 @@ void printchild(json_child *child, size_t tabs) {
         printf("\t");
         iter--;
     } printf("}");
+    if (tabs == 0) {
+        printf("\n");
+    }
 }
 
 int main() {

@@ -205,14 +205,14 @@ json_object read_object(char* value, size_t size) {
 json_object *read_array(char *value, size_t size) {
     Token* pairs = split_into_pairs(value, size, 1); // vector
     vector_metainfo meta = vec_meta(pairs);
-    json_object *array = new_vec(sizeof(json_pair), meta.length);
+    json_object *array = new_vec(sizeof(json_object), meta.length);
     json_object temp;
     for (int i=0; i<meta.length; i++) {
         // printf(remove_spaces(pairs[i].start, pairs[i].end - pairs[i].start));
         // printf("##\n");
         temp = read_object(remove_spaces(pairs[i].start, pairs[i].end - pairs[i].start),
                 pairs[i].end - pairs[i].start);
-        printf("%d\n", temp.type);
+        // printf("%d\n", temp.type);
         array = vec_add(array, &temp);
     }
     return array;
