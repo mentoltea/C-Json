@@ -143,6 +143,7 @@ json_pair parse_pair(Token *tk) {
     // printf(key);
     //printf("SIZE OF %s %d\n", value, strlen(value));
     pair.value = read_object(value, strlen(value)+1);
+    memfree(value);
     return pair;   
 }
 
@@ -176,7 +177,7 @@ json_object_types object_type(char* value, size_t size) {
 json_object read_object(char* value, size_t size) {
     json_object_types type = object_type(value, size);
     json_object obj; obj.type = type;
-    json_child *child = memloc(sizeof(json_child));
+    json_child *child;
     switch (type) {
         case STR:
             obj.data.str = string_from_ptrs(value+1, value+size-2);
@@ -196,6 +197,7 @@ json_object read_object(char* value, size_t size) {
             break;
         case CHILD:
             // printf("child | %s\n", value);
+            child = memloc(sizeof(json_child));
             *child = read_child(value, size);
             obj.data.child = child;
             break;
@@ -219,6 +221,7 @@ json_object *read_array(char *value, size_t size) {
         // printf("%d\n", temp.type);
         array = vec_add(array, &temp);
     }
+    delete_vec(pairs);
     return array;
 }
 
@@ -232,6 +235,7 @@ json_child read_child(char *str, size_t size) {
         temp = parse_pair(pairs+i);
         child.fields = vec_add(child.fields, &temp);
     }
+    delete_vec(pairs);
     return child;
 }
 
@@ -240,7 +244,9 @@ json_child read_json(FILE* fd) {
     size_t size = ftell(fd);
     fseek(fd, 0, SEEK_SET);
     char* str = read_from_file(fd, size);
-    return read_child(str, size);
+    json_child result = read_child(str, size);
+    memfree(str);
+    return result;
 }
 
 

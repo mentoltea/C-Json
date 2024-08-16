@@ -15,11 +15,25 @@ int main() {
     json_child glob = read_json(fd);
     fclose(fd);
 
+    json_child ch;
+    ch.fields = new_vec(sizeof(json_pair), 10);
+    json_pair pr;
+    json_object ob;
+    for (int i=0; i<5; i++) {
+        pr.key = memloc(3*sizeof(char));
+        sprintf(pr.key, "%d", i+1);
+        ob.type = INT;
+        ob.data.num = i;
+        pr.value = ob;
+        ch.fields = vec_add(ch.fields, &pr);
+    }
+
     json_object obj;
-    obj.type = STR;
-    obj.data.str = "new data";
+    obj.type = CHILD;
+    obj.data.child = &ch;
+
     json_pair pair;
-    pair.key = "KeYY";
+    pair.key = "CH ADD";
     pair.value = obj;
 
     glob.fields = vec_add(glob.fields, &pair);
@@ -28,6 +42,7 @@ int main() {
     save_json(fd, &glob);
     fclose(fd);
 
+    page_info(0);
     destroy_pages();
     return 0;
 }
