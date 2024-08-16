@@ -30,7 +30,7 @@ int main() {
 
     json_object obj;
     obj.type = CHILD;
-    obj.data.child = &ch;
+    obj.data.child = ch;
 
     json_pair pair;
     pair.key = "CH ADD";

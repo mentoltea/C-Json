@@ -12,12 +12,18 @@ typedef enum  {
     CHILD
 } json_object_types; 
 
+struct json_child_struct {
+    struct json_pair_struct* fields; // vector
+    // struct json_child_struct* parent; // pointer
+};
+typedef struct json_child_struct json_child;
+
 typedef union {
     char* str;
     int num;
     float dec;
     struct json_object_struct* array; //vector
-    struct json_child_struct* child;
+    struct json_child_struct child;
 } json_data;
 
 struct json_object_struct {
@@ -33,11 +39,7 @@ struct json_pair_struct {
 typedef struct json_pair_struct json_pair;
 
 
-struct json_child_struct {
-    struct json_pair_struct* fields; // vector
-    // struct json_child_struct* parent; // pointer
-};
-typedef struct json_child_struct json_child;
+
 
 
 

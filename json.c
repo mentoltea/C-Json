@@ -2,7 +2,7 @@
 
 void init_json() {
     set_funcs(memloc, memfree, memcpy);
-    prealloc(PAGE_SIZE*4);
+    prealloc(PAGE_SIZE);
 }
 
 void exit_on_error(int code) {
@@ -177,7 +177,7 @@ json_object_types object_type(char* value, size_t size) {
 json_object read_object(char* value, size_t size) {
     json_object_types type = object_type(value, size);
     json_object obj; obj.type = type;
-    json_child *child;
+    // json_child *child;
     switch (type) {
         case STR:
             obj.data.str = string_from_ptrs(value+1, value+size-2);
@@ -197,9 +197,9 @@ json_object read_object(char* value, size_t size) {
             break;
         case CHILD:
             // printf("child | %s\n", value);
-            child = memloc(sizeof(json_child));
-            *child = read_child(value, size);
-            obj.data.child = child;
+            // child = memloc(sizeof(json_child));
+            // *child = read_child(value, size);
+            obj.data.child = read_child(value, size);
             break;
         default:
             break;
@@ -285,7 +285,7 @@ void fprintarray(FILE *fd, json_object *array, size_t tabs) {
                 fprintf(fd, "%f", temp.data.dec);
                 break;
             case CHILD:
-                fprintchild(fd, temp.data.child, tabs);
+                fprintchild(fd, &temp.data.child, tabs);
                 break;
             case ARRAY:
                 fprintarray(fd, temp.data.array, tabs+1);
@@ -341,7 +341,7 @@ void fprintchild(FILE *fd, json_child *child, size_t tabs) {
                 fprintf(fd, "%f", temp.value.data.dec);
                 break;
             case CHILD:
-                fprintchild(fd, temp.value.data.child, tabs);
+                fprintchild(fd, &temp.value.data.child, tabs);
                 break;
             case ARRAY:
                 fprintarray(fd, temp.value.data.array, tabs+1);
