@@ -1,17 +1,38 @@
 {
-	"name" : "table",
-	"id" : 1 ,
-	"child" : {
-		"c" : "c",
-		"d" : "ff"
-	},
-	"other" : [
+	"compiler" : "gcc",
+	"linker" : "gcc",
+	"format" : ".c",
+	"indir" : "./",
+	"outdir" : "bin/",
+	"target" : "build.exe",
+	"cflags" : "-c",
+	"cpp_source" : [
+		"build",
 		{
-			"age" : 1.56
+			"name" : "json",
+			"format" : ".c",
+			"dependencies" : [
+				[
+					{
+						"json" : "json.h"
+					}
+				]
+			]
 		},
 		{
-			"name" : "name"
+			"name" : "vector",
+			"compiler" : "gcc",
+			"format" : ".c",
+			"dependencies" : [
+				"vector.h"
+			]
 		},
-		3
+		{
+			"name" : "memmanager",
+			"format" : ".c",
+			"dependencies" : [
+				"memmanager.h"
+			]
+		}
 	]
 }
