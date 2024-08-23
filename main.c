@@ -44,6 +44,7 @@ int main() {
     save_json(fd, &glob);
     fclose(fd);
 
+    dealloc_json(&glob);
     page_info(0);
     destroy_pages();
     printf("\nsucces\n");

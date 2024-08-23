@@ -2,7 +2,7 @@
 
 void init_json() {
     set_funcs(memloc, memfree, memcpy);
-    prealloc(PAGE_SIZE);
+    prealloc(PAGE_SIZE*2);
 }
 
 void exit_on_error(int code) {
@@ -226,11 +226,14 @@ json_object *read_array(char *value, size_t size) {
     vector_metainfo meta = vec_meta(pairs);
     json_object *array = new_vec(sizeof(json_object), meta.length);
     json_object temp;
+    char* ptr;
     for (int i=0; i<meta.length; i++) {
         // printf(remove_spaces(pairs[i].start, pairs[i].end - pairs[i].start));
         // printf("##\n");
-        temp = read_object(remove_spaces(pairs[i].start, pairs[i].end - pairs[i].start),
-                pairs[i].end - pairs[i].start);
+        ptr = remove_spaces(pairs[i].start, pairs[i].end - pairs[i].start);
+        temp = read_object(ptr, pairs[i].end - pairs[i].start);
+        memfree(ptr);
+
         // printf("%d\n", temp.type);
         array = vec_add(array, &temp);
     }
@@ -382,4 +385,46 @@ void fprintchild(FILE *fd, json_child *child, size_t tabs) {
 
 void save_json(FILE* fd, json_child* child) {
     fprintchild(fd, child, 0);
+}
+
+void dealloc_json_child(json_child* child) {
+    vector_metainfo meta = vec_meta(child->fields);
+    for (int i=0; i<meta.length; i++) {
+        dealloc_json_pair(child->fields+i);
+    }
+    delete_vec(child->fields);
+}
+
+void dealloc_json_pair(json_pair *pair) {
+    memfree(pair->key);
+    dealloc_json_object(&pair->value);
+}
+
+void dealloc_json_object(json_object *obj) {
+    switch (obj->type) {
+    case STR:
+        memfree(obj->data.str);
+        break;
+    case ARRAY:
+        dealloc_json_array(obj->data.array);
+        break;
+    case CHILD:
+        dealloc_json_child(&obj->data.child);
+        break;
+    default:
+        break;
+    }
+}
+
+void dealloc_json_array(json_object* array) {
+    vector_metainfo meta = vec_meta(array);
+    for (int i=0; i<meta.length; i++) {
+        dealloc_json_object(array+i);
+    }
+    delete_vec(array);
+}
+
+
+void dealloc_json(json_child* child) {
+    dealloc_json_child(child);
 }
