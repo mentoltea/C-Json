@@ -2,7 +2,7 @@
 
 void init_json() {
     set_funcs(memloc, memfree, memcpy);
-    prealloc(PAGE_SIZE*2);
+    prealloc(PAGE_SIZE*3/2);
 }
 
 void exit_on_error(int code) {
