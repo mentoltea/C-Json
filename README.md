@@ -58,7 +58,7 @@ void fprintarray(FILE *fd, json_object *array, size_t tabs);
 
 ## Example of usage
 This code reads json-file from "build.json", adds a new field named "CH ADD" of child, that consists of fields named (n+1) with a value n for n=0..4, and saves it to file "added.json".  
-Another example of usage you can see [here](https://github.com/mentoltea/C-Build/build.c).
+Another example of usage you can see [here](https://github.com/mentoltea/C-Builder).
 ```
 int main() {
     init_json();
